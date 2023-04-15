@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 import openai
 import tiktoken
@@ -26,6 +27,17 @@ def chunks(text, max_tokens=2500):
 
 
 def chat(user, temperature=0.3):
+    for attempt in range(5):
+        try:
+            return _chat(user, temperature)
+        except (openai.error.RateLimitError, openai.error.ServiceUnavailableError, openai.error.APIError) as e:
+            wait = 2 ** attempt
+            print(f"[{type(e).__name__}] retrying in {wait}s...")
+            time.sleep(wait)
+    return _chat(user, temperature)
+
+
+def _chat(user, temperature):
     resp = openai.ChatCompletion.create(
         model=MODEL,
         temperature=temperature,

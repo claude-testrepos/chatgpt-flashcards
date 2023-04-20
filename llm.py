@@ -1,6 +1,9 @@
+import hashlib
 import json
 import os
 import time
+
+from pathlib import Path
 
 import openai
 import tiktoken
@@ -9,6 +12,7 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 MODEL = os.environ.get("STUDY_MODEL", "gpt-3.5-turbo")
 enc = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
+CACHE = Path(".gpt_cache")
 SYSTEM = "You are a helpful teaching assistant. Be accurate and concise. Only use facts from the notes."
 
 
@@ -38,12 +42,20 @@ def chat(user, temperature=0.3):
 
 
 def _chat(user, temperature):
+    # same notes -> same prompt; don't pay twice while I iterate on the quiz
+    key = hashlib.sha256(f"{MODEL}|{temperature}|{SYSTEM}|{user}".encode()).hexdigest()
+    path = CACHE / f"{key}.txt"
+    if path.exists():
+        return path.read_text()
     resp = openai.ChatCompletion.create(
         model=MODEL,
         temperature=temperature,
         messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
     )
-    return resp["choices"][0]["message"]["content"]
+    out = resp["choices"][0]["message"]["content"]
+    CACHE.mkdir(exist_ok=True)
+    path.write_text(out)
+    return out
 
 
 def chat_json(user):

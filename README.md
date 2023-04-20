@@ -1,6 +1,6 @@
 # GPT Study Assistant
 
-Turns lecture notes into flashcards, summaries and an inetractive quiz graded by GPT. Made during midterms when ChatGPT came out.
+Turns lecture notes into flashcards, summaries and an interactive quiz graded by GPT. Made during midterms when ChatGPT came out.
 
 ## Setup
 

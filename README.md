@@ -16,3 +16,9 @@ python study.py cards examples/os-lecture-07.md --anki cards.csv
 python study.py summary notes.md
 python study.py quiz notes.md -n 5
 ```
+
+## TODO
+
+- [ ] add CI
+- [ ] refactor into smaller functions
+- [ ] better error messages
